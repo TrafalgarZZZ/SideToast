@@ -14,10 +14,14 @@ import java.util.TimerTask;
 
 
 public class SideToast {
-    private static boolean isShow = false;
+    private static int isShow = 0;
+    private static int maxIndex = 0;
+    private static final int MAX_SHOW_NUMBER = 3;
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
+
+
 
     private View toastView;
     private int duration;
@@ -91,16 +95,23 @@ public class SideToast {
     }
 
     public void show(){
-        if(!isShow){
-            isShow = true;
+        if(isShow <= MAX_SHOW_NUMBER - 1){
+            params.y += maxIndex * 150;
             windowManager.addView(toastView,params);
+            isShow++;
+            maxIndex = (maxIndex + 1) % MAX_SHOW_NUMBER;
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     windowManager.removeView(toastView);
-                    isShow = false;
+                    isShow--;
+                    if(isShow == 0){
+                        maxIndex = 0;
+                    }
                 }
             },(long)(duration == 1 ? 3500 : 2000));
+
+
         }
     }
 
